@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wr.dao.PledgeDao">
+    <!--    针对于货主，不完善，加条件加user_id-->
+    <sql id="selectByState">
+        <where>
+            (from_user_id = #{userId} OR to_user_id = #{userId})
+            <if test="state!=null">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+    <select id="findPledgePage" resultType="pledge">
+        select * from t_pledge
+        <include refid="selectByState"/>
+        order by create_time
+        limit #{startIndex},#{pageSize}
+    </select>
+<!--  针对与仓库方的分页查询  -->
+    <select id="selectRows" resultType="int">
+        select count(*)
+        from t_pledge t left join t_electronic_warehouse e
+        on t.electronic_warehouse_id = e.id AND e.repo_id = #{repoId}
+    </select>
+    <!--  查询分页数据  -->
+    <select id="getTransferPageToRepo" resultType="pledge">
+        select t.id,t.from_user_id,t.to_user_id,t.electronic_warehouse_id,
+        t.company,t.repo_name,t.goods_name,t.state,t.create_time
+        from t_pledge t left join t_electronic_warehouse e
+        on t.electronic_warehouse_id = e.id
+        where e.repo_id = #{repoId}
+        order by t.create_time asc
+    </select>
+</mapper>

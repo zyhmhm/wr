@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wr.dao.CashDao">
+    <!-- 针对于仓库方-->
+    <sql id="selectByNameAndRepoId">
+        <where>
+            repo_id = #{repoId}
+            <if test="consigneeName!=null and consigneeName!=''">
+                AND consignee_name like concat("%",#{consigneeName},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="doGetCashPage" resultType="cash">
+        select * from t_cash
+        <include refid="selectByNameAndRepoId"/>
+        order by cash_date
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <!-- 针对于货主方-->
+    <sql id="selectByNameAndUserId">
+        <where>
+            user_id = #{userId}
+            <if test="consigneeName!=null and consigneeName!=''">
+                AND consignee_name like concat("%",#{consigneeName},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="doGetCashPageToShipper" resultType="cash">
+        select * from t_cash
+        <include refid="selectByNameAndUserId"/>
+        order by cash_date
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <select id="getRepoId" resultType="long">
+        select depository_id from t_ordermaking
+        where id = (select ordermaking_id from t_electronic_warehouse where id = #{electronicWarehouseId})
+    </select>
+
+</mapper>

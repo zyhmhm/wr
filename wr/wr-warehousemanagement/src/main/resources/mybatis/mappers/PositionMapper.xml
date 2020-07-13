@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wr.dao.PositionDao">
+    <!--    针对于货主，不完善，加条件加user_id-->
+    <sql id="selectByState">
+        <where>
+            repo_id = #{repoId}
+            <if test="state!=null">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+    <select id="findPositionPage" resultType="position">
+        select * from t_position
+        <include refid="selectByState"/>
+        order by create_time
+        limit #{startIndex},#{pageSize}
+    </select>
+</mapper>

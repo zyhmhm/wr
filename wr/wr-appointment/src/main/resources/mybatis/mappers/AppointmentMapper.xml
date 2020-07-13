@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wr.dao.AppointmentDao">
+
+<!--    针对于货主，不完善，加条件加user_id-->
+    <sql id="selectByName">
+        <where>
+        user_id = #{userId}
+        <if test="state!=null">
+            AND state = #{state}
+        </if>
+        <if test="contacts!=null and contacts!=''">
+            AND contacts like concat("%",#{contacts},"%")
+        </if>
+        </where>
+    </sql>
+    <resultMap id="queryApp" type="appointment">
+        <association property="depositoryName" column="depository_id" select="com.wr.dao.RepoDao.findRepoNameById"/>
+    </resultMap>
+    <select id="findAppointmentPage" resultMap="queryApp">
+        select * from t_appointment
+        <include refid="selectByName"/>
+        order by storage_time
+        limit #{startIndex},#{pageSize}
+    </select>
+<!-- 针对于仓库方-->
+    <sql id="selectByNameAndRepoId">
+        <where>
+            depository_id = #{repoId} AND state > 1
+            <if test="contacts!=null and contacts!=''">
+                AND contacts like concat("%",#{contacts},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="findAppointmentPageByRepoId" resultMap="queryApp">
+        select * from t_appointment
+        <include refid="selectByNameAndRepoId"/>
+        order by storage_time
+        limit #{startIndex},#{pageSize}
+    </select>
+<!--针对于货主可以指但的查询-->
+    <sql id="selectByNameAndUserId">
+        <where>
+            user_id = #{userId}
+            <choose>
+                <when test="state != null">
+                    AND state = #{state}
+                </when>
+                <otherwise>
+                    AND state in (8,9,10,11,12)
+                </otherwise>
+            </choose>
+            <if test="contacts!=null and contacts!=''">
+                AND contacts like concat("%",#{contacts},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="findNeedMadeAppoByContactsAndUserId" resultMap="queryApp">
+        select * from t_appointment
+        <include refid="selectByNameAndUserId"/>
+        order by storage_time
+        limit #{startIndex},#{pageSize}
+    </select>
+
+</mapper>

@@ -1,0 +1,51 @@
+server:
+  port: 9099
+  servlet:
+    context-path: /
+spring:
+  application:
+    name: repo-service
+  datasource:
+    #引入druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/wrdb?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
+    username: root
+    password: 920521
+  jackson:
+    date-format: yyyy/MM/dd HH:mm:ss
+    time-zone: GMT
+
+#mybatis-plush配置
+mybatis-plus:
+  type-aliases-package: com.wr.pojo
+  mapper-locations: classpath:/mybatis/mappers/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.jt.mapper: debug
+
+#整合eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka1:2001/eureka,http://eureka1:2002/eureka
+
+ribbon:
+  eureka:
+    enabled: true
+
+feign:
+  hystrix:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+
+
+

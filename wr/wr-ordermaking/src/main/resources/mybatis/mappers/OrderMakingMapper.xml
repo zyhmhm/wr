@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wr.dao.OrderMakingDao">
+
+    <!-- 针对于仓库方-->
+    <sql id="selectByNameAndRepoId">
+        <where>
+            depository_id = #{repoId}
+            <if test="shipper!=null and shipper!=''">
+                AND shipper like concat("%",#{shipper},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="doGetOrderMakingToRepo" resultType="orderMaking">
+        select * from t_ordermaking
+        <include refid="selectByNameAndRepoId"/>
+        order by validity_period
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <!-- 针对于货主方-->
+    <sql id="selectByNameAndState">
+        <where>
+            depository_id = #{repoId}
+            <if test="shipper!=null and shipper!=''">
+                AND shipper like concat("%",#{shipper},"%")
+            </if>
+            <if test="state!=null">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+    <select id="doGetOrderMakingToShipper" resultType="orderMaking">
+        select * from t_ordermaking
+        <include refid="selectByNameAndState"/>
+        order by validity_period
+        limit #{startIndex},#{pageSize}
+    </select>
+</mapper>

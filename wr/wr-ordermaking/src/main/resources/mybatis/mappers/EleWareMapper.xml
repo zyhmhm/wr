@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wr.dao.ElectronicWarehouseDao">
+    <!--    针对于货主，不完善，加条件加user_id-->
+    <sql id="selectByState">
+        <where>
+            user_id = #{userId} OR repo_id=#{repoId}
+            <if test="inventor!=null and inventor!=''">
+                AND inventor like concat("%",#{inventor},"%")
+            </if>
+            <if test="state!=null">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+    <select id="findEleWarePage" resultType="electronicWarehouse">
+        select * from t_electronic_warehouse
+        <include refid="selectByState"/>
+        order by effective_dates
+        limit #{startIndex},#{pageSize}
+    </select>
+</mapper>
